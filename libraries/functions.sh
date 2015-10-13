@@ -12,6 +12,7 @@ usage() {
   echo "Options: "
   echo "--help     shows this usage info"
   echo "--verbose  prints verbose output"
+  echo "--update   updated datasources and exits"
   msg "Measurements: "
   list_measurements
 }
@@ -53,7 +54,7 @@ check_directory_access() {
 #######################################
 update_datasources() {
   local datasources=( "http://services.swpc.noaa.gov/text/ace-magnetometer.txt" "http://services.swpc.noaa.gov/text/wing-kp.txt" "http://services.swpc.noaa.gov/text/ace-swepam.txt" )
-  local update_timeout=5
+  local update_timeout=10
 
   vmsg "Updating datasources..." >&2
 
@@ -61,9 +62,26 @@ update_datasources() {
   check_directory_access "${data_d}"
 
   for datasource in "${datasources[@]}" ; do
-    local get_data="$( cd ${data_d} ; timeout -s 9 ${update_timeout}  wget -q -N "${datasource}" )"
+    local get_data="$( cd ${data_d} ; wget --timeout=${update_timeout} -q -N "${datasource}" )"
     if [ $? -ne 0 ]; then
       abrt "ERROR: unable to retrieve datasource ${datasource}. Exiting."
     fi
   done
+}
+
+#######################################
+# Checks if a value is in an array
+# http://stackoverflow.com/a/8574392
+# Globals:
+#  none
+# Arguments:
+#  arraay
+# Returns:
+#   0 for present value
+#   1 for absent value
+#######################################
+containsElement () {
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
 }

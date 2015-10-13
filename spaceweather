@@ -8,7 +8,7 @@
 #set -x
 
 # CONSTANTS
-readonly home_d="$( readlink -f "$( dirname $0 )"  )"
+home_d="$( dirname $0 )" ; readonly home_d="$( cd "${home_d}" ; pwd )" 
 readonly conf_f="${home_d}/spaceweather.conf"
 readonly libraries_d="${home_d}/libraries"
 readonly data_d="${home_d}/data"
@@ -64,10 +64,29 @@ main() {
   # Get latest data
   update_datasources || abrt "ERROR: Unable to retreive latest data. Exiting."
 
+
+  # Test that argument is an acceptable measurement
+  remaining_opts=( $@ )
+  for remaining_opt in "${remaining_opts[@]}" ; do
+    containsElement "${remaining_opt}" "${measurements[@]}"
+    if [ $? -ne 0 ]; then
+      abrt "ERROR: ${remaining_opt} is not a valid measurement or option. Exiting."
+    fi
+  done
+
+
   if [ -n "$1" ]; then
     measurements=( $( echo $@ ) )
     for measurement in "${measurements[@]}" ; do
-      echo "${measurement}: $( ${measurement} )"
+      measurement_result="$( ${measurement} 2>/dev/null )"
+      measurement_ec=$?
+      if [ ${measurement_ec} -eq 0 ]; then
+        echo "${measurement}: $( ${measurement} 2>/dev/null ; measurement_ec=$? )"
+      elif [ ${measurement_ec} -eq 127 ]; then
+        abrt "ERROR: Measurement ${measurement} not found. Exiting"
+      else
+        echo "Measurement error: ${measurement} ${measurement_ec}"
+      fi
     done
   else
     abrt "ERROR: no measurement found."
