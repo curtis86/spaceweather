@@ -18,7 +18,7 @@ readonly max_args=2
 # SCRIPT FUNCTIONS
 abrt() { echo ; echo "$@" ; exit 1 ; }
 msg() { echo ; echo "$@" ; }
-vmsg() { echo ; [ $verbose] && echo "$@" >&2 ; }
+vmsg() { [ $verbose ] && echo ; [ $verbose ] && echo "$@" >&2 ; }
 
 # INCLUDES
 source "${conf_f}" || abrt "ERROR: unable to load configuration file (${conf_f}). Exiting."
