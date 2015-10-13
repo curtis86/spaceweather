@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+#
+# Collects and prints spaceweather sensor data from NASA / NOAA
+# Author: Curtis Kneisel
+# GitHub: https://github.com/curtis86/spaceweather
+
+# Uncomment for debug
+#set -x
+
+# CONSTANTS
+readonly home_d="$( readlink -f "$( dirname $0 )"  )"
+readonly conf_f="${home_d}/spaceweather.conf"
+readonly libraries_d="${home_d}/libraries"
+readonly data_d="${home_d}/data"
+readonly dependencies=( "bc" "wget" )
+readonly max_args=2
+
+# SCRIPT FUNCTIONS
+abrt() { echo ; echo "$@" ; exit 1 ; }
+msg() { echo ; echo "$@" ; }
+vmsg() { echo ; [ $verbose] && echo "$@" >&2 ; }
+
+# INCLUDES
+source "${conf_f}" || abrt "ERROR: unable to load configuration file (${conf_f}). Exiting."
+source "${libraries_d}/functions.sh" || abrt "ERROR: unable to load functions file (${libraries_d}/functions.sh). Exiting."
+source "${libraries_d}/measurements.sh" || abrt "ERROR: unable to load measurements library file (${libraries_d}/measurements.sh). Exiting."
+
+# MAIN
+main() {
+  # Dependency check
+  for dep in "${dependencies[@]}" ; do
+    if ! which ${dep} >/dev/null 2>&1 ; then
+      abrt "ERROR: dependency ${dep} not found in \$PATH setting. Please install ${dep} first."
+    fi
+  done
+
+  [ -z "$1" ] && msg "ERROR: no argument received." && usage && exit
+
+  # Parse arguments... crudely
+  OPTS=$@
+  for opt in $@ ; do
+    case $opt in
+      "--verbose") verbose=true ; OPTS=$( echo "$@" | sed "s/${opt}//g" ) ; set -- $OPTS ;;
+      "--update") verbose=true; update_datasources ; exit $? ;;
+      "--help") usage && exit ;;
+      --*) abrt "ERROR: uknown option: ${opt}. Exiting." ;;
+      -*) abrt "ERROR: uknown option: ${opt}. Exiting." ;;
+    esac
+  done
+
+  # Check directories exist and are writeable
+  if ! check_directory_access "${home_d}" "${data_d}" >/dev/null 2>&1 ; then
+    abrt "ERROR: some directories are not writeable. Please ensure this user has R+W access."
+  fi
+
+  # Get list of measurement functions
+  declare -a measurements
+  if ! list_measurements >/dev/null 2>&1 ; then
+    abrt "ERROR: no measurement functions found. Exiting."
+  else
+    measurements=( $( list_measurements ) )    
+  fi
+
+  # Get latest data
+  update_datasources || abrt "ERROR: Unable to retreive latest data. Exiting."
+
+  if [ -n "$1" ]; then
+    measurements=( $( echo $@ ) )
+    for measurement in "${measurements[@]}" ; do
+      echo "${measurement}: $( ${measurement} )"
+    done
+  else
+    abrt "ERROR: no measurement found."
+  fi
+
+  vmsg "Script completed" >&2
+}
+
+main $@
