@@ -12,7 +12,7 @@ usage() {
   echo "Options: "
   echo "--help     shows this usage info"
   echo "--verbose  prints verbose output"
-  echo "--update   updated datasources and exits"
+  echo "--update   updates datasources and exits"
   msg "Measurements: "
   list_measurements
 }

@@ -11,7 +11,6 @@
 #######################################
 m_ace_magnetometer_bz () {
   local data_f="${data_d}/ace-magnetometer.txt"
-
   local data="$( grep -E -v "^#|^\:" "${data_f}" | tail -n1 | awk '$7 == 0 { print $10 }' )"
 
   if [ -z "${data}" ]; then
@@ -27,7 +26,6 @@ m_ace_magnetometer_bz () {
 #######################################
 m_ace_solar_wind_speed () {
   local data_f="${data_d}/ace-swepam.txt"
-
   local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$7 == 0 { print $9 }' | tail -n1 )"
 
   if [ -z "${data}" ]; then
@@ -43,7 +41,6 @@ m_ace_solar_wind_speed () {
 #######################################
 m_ace_particle_density () {
   local data_f="${data_d}/ace-swepam.txt"
- 
   local data="$( grep -v ^# ${data_f} | grep '^[0-9]' | awk '$7 == 0 { print $8 }' | tail -n1 )"
 
   if [ -z "${data}" ]; then
@@ -58,10 +55,8 @@ m_ace_particle_density () {
 # Unit: minutes
 #######################################
 m_ace_solar_wind_eta () {
-  local wind_speed=$( m_ace_solar_wind_speed )
-
+  local wind_speed=$( m_ace_solar_wind_speed ) || return 1
   local ace_distance_to_earth=1500000
-
   local data="$( echo "${ace_distance_to_earth} / ${wind_speed} / 60" | bc )"
 
   if [ -z "${data}" ]; then
@@ -76,7 +71,6 @@ m_ace_solar_wind_eta () {
 #######################################
 m_wing_kp_index () {
   local data_f="${data_d}/wing-kp.txt"
-
   local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$5 == 0 { print $18 }' | tail -n1 )"
 
   if [ -z "${data}" ]; then

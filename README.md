@@ -59,6 +59,10 @@ m_ace_solar_wind_speed: 518.1
 m_wing_kp_index: 3.67
 ```
 
+## Notes
+
+From time to time, data measurements by ACE can include a bad or missing data record. In this case, the measurement will return 9999.
+
 ## Disclaimer
 
 I'm not a programmer, but I do like to make things! Please use this at your own risk.

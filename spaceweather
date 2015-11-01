@@ -8,7 +8,7 @@
 #set -x
 
 # CONSTANTS
-home_d="$( dirname $0 )" ; readonly home_d="$( cd "${home_d}" ; pwd )" 
+home_d="$( dirname $0 )" ; readonly home_d="$( cd "${home_d}" ; pwd )"
 readonly conf_f="${home_d}/spaceweather.conf"
 readonly libraries_d="${home_d}/libraries"
 readonly data_d="${home_d}/data"
@@ -58,7 +58,7 @@ main() {
   if ! list_measurements >/dev/null 2>&1 ; then
     abrt "ERROR: no measurement functions found. Exiting."
   else
-    measurements=( $( list_measurements ) )    
+    measurements=( $( list_measurements ) )
   fi
 
   # Get latest data
@@ -85,7 +85,7 @@ main() {
       elif [ ${measurement_ec} -eq 127 ]; then
         abrt "ERROR: Measurement ${measurement} not found. Exiting"
       else
-        echo "Measurement error: ${measurement} ${measurement_ec}"
+        echo "${measurement}: 9999"
       fi
     done
   else
