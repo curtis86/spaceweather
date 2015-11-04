@@ -67,7 +67,7 @@ m_ace_solar_wind_eta () {
 }
 
 #######################################
-# Returns Wing Kp Index
+# Returns Wing Kp Index (Current USAF)
 #######################################
 m_wing_kp_index () {
   local data_f="${data_d}/wing-kp.txt"
@@ -79,6 +79,35 @@ m_wing_kp_index () {
     echo "${data}"
   fi
 }
+
+#######################################
+# Returns Wing Kp Index 1-hour Forecast
+#######################################
+m_wing_kp_one_hour_forecast () {
+  local data_f="${data_d}/wing-kp.txt"
+  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$9 != -1 { print $9 }' | tail -n1 )"
+
+  if [ -z "${data}" ]; then
+    return 1
+  else
+    echo "${data}"
+  fi
+}
+
+#######################################
+# Returns Wing Kp Index 4-hour Forecast
+#######################################
+m_wing_kp_four_hour_forecast () {
+  local data_f="${data_d}/wing-kp.txt"
+  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$14 != -1 { print $14 }' | tail -n1 )"
+
+  if [ -z "${data}" ]; then
+    return 1
+  else
+    echo "${data}"
+  fi
+}
+
 
 #######################################
 # Lists defined measurements
