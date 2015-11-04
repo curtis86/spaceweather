@@ -7,7 +7,7 @@ Retrieves spaceweather measurements from various sources (eg: ACE, NOAA). Curren
 - ACE IMF Magnetometer Bz
 - ACE Solar Wind Speed
 - ACE Particle Density
-- Wing Kp Index
+- Wing Kp Index (Current, 1-hour and 4-hour forecast)
 - Solar Wind ETA (based on ACE Solar Wind Speed)
 
 ## B. Dependencies
@@ -38,13 +38,16 @@ Usage: spaceweather <measurement> <options>
 Options:
 --help     shows this usage info
 --verbose  prints verbose output
+--update   updates datasources and exits
 
 Measurements:
 m_ace_magnetometer_bz
 m_ace_particle_density
 m_ace_solar_wind_eta
 m_ace_solar_wind_speed
+m_wing_kp_four_hour_forecast
 m_wing_kp_index
+m_wing_kp_one_hour_forecast
 ```
 
 ### Sample output
