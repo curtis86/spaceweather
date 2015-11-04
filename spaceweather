@@ -61,10 +61,6 @@ main() {
     measurements=( $( list_measurements ) )
   fi
 
-  # Get latest data
-  update_datasources || abrt "ERROR: Unable to retreive latest data. Exiting."
-
-
   # Test that argument is an acceptable measurement
   remaining_opts=( $@ )
   for remaining_opt in "${remaining_opts[@]}" ; do
@@ -73,6 +69,9 @@ main() {
       abrt "ERROR: ${remaining_opt} is not a valid measurement or option. Exiting."
     fi
   done
+
+  # Get latest data
+  update_datasources || abrt "ERROR: Unable to retreive latest data. Exiting."
 
 
   if [ -n "$1" ]; then

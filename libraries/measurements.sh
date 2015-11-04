@@ -71,7 +71,7 @@ m_ace_solar_wind_eta () {
 #######################################
 m_wing_kp_index () {
   local data_f="${data_d}/wing-kp.txt"
-  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$5 == 0 { print $18 }' | tail -n1 )"
+  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$15 != -1 { print $15 }' | tail -n1 )"
 
   if [ -z "${data}" ]; then
     return 1
