@@ -10,6 +10,8 @@ Retrieves spaceweather measurements from various sources (eg: ACE, NOAA). Curren
 - Wing Kp Index (Current, 1-hour and 4-hour forecast)
 - Solar Wind ETA (based on ACE Solar Wind Speed)
 
+See some of the data in action at https://spaceweather.xyz/
+
 ## B. Dependencies
 
 The following binaries are required:
