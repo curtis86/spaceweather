@@ -26,8 +26,6 @@ The following binaries are required:
 
 2) wget
 
-3) jq
-
 These dependencies are widely available for almost every Linux/BSD distro.
 
 ## C. Supported Systems

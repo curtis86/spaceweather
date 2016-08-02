@@ -208,7 +208,9 @@ m_dscovr_magnetometer_bz()
 {
 
   local data_f="${DATA_DIR}/mag-2-hour.json"
-  local data="$( jq '.[-1]' ${data_f} | jq '.[3]' | sed 's/"//g' )"
+
+  # Long sed statements in place of jq for now (for compatability reasons)
+  local data="$( cat "${data_f}" | tr '],' '\n' | sed 's/\[//g' | tail -8 | sed 's/"//g' | head -n4 | tail -n1 )"
 
   if [ -z "${data}" ]; then
     return 1
@@ -227,7 +229,9 @@ m_dscovr_magnetometer_bt()
 {
 
   local data_f="${DATA_DIR}/mag-2-hour.json"
-  local data="$( jq '.[-1]' ${data_f} | jq '.[6]' | sed 's/"//g' )"
+  
+  # Long sed statements in place of jq for now (for compatability reasons)
+  local data="$( cat "${data_f}" | tr '],' '\n' | sed 's/\[//g' | tail -8 | sed 's/"//g' | tail -n2 | head -n1 )"
 
   if [ -z "${data}" ]; then
     return 1
@@ -245,7 +249,9 @@ m_dscovr_plasma_speed()
 {
 
   local data_f="${DATA_DIR}/plasma-2-hour.json"
-  local data="$( jq '.[-1]' ${data_f} | jq '.[2]' | sed 's/"//g' )"
+
+  # Long sed statements in place of jq for now (for compatability reasons)
+  local data="$( cat "${data_f}" | tr '],' '\n' | sed 's/\[//g' | sed 's/"//g' | tail -5 | head -n3 | tail -n1 )"
 
   if [ -z "${data}" ]; then
     return 1
@@ -263,7 +269,9 @@ m_dscovr_plasma_density()
 {
 
   local data_f="${DATA_DIR}/plasma-2-hour.json"
-  local data="$( jq '.[-1]' ${data_f} | jq '.[1]' | sed 's/"//g' )"
+
+  # Long sed statements in place of jq for now (for compatability reasons)
+  local data="$( cat "${data_f}" | tr '],' '\n' | sed 's/\[//g' | sed 's/"//g' | tail -5 | head -n2 | tail -n1 )"
 
   if [ -z "${data}" ]; then
     return 1
