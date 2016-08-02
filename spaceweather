@@ -25,14 +25,11 @@ main() {
   # Ensure directories exist
   setup_directories
 
-  verbose=false
-
   # Parse arguments... crudely
   OPTS=$@
   for opt in ${OPTS[@]} ; do
     case $opt in
-      "--verbose") verbose=true ; OPTS=$( echo "$@" | sed "s/${opt}//g" ) ; set -- $OPTS ;;
-      "--update") verbose=true; update_datasource ; exit $? ;;
+      "--update") { bp::vmsg "Updating datasource(s)..." ; update_datasource ; vmsg "Script completed" ; exit $? ;} ;;
       "--help") usage && exit ;;
       --*) bp::abrt "uknown option: ${opt}" ;;
       -*) bp::abrt "uknown option: ${opt}" ;;
@@ -75,9 +72,6 @@ main() {
   else
     abrt "ERROR: no measurement found."
   fi
-
-  [ ${verbose} = true ] && vmsg "Script completed" >&2
-
 
 }
 

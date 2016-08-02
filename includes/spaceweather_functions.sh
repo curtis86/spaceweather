@@ -56,8 +56,6 @@ update_datasource() {
   
   set -u
 
-  [ ${verbose} = true ] && bp::vmsg "Updating datasource(s)..." >&2
-
   # Extra check to ensure data directory exists.
   bp::test_access "${DATA_DIR}"
 
