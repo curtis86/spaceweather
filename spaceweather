@@ -1,62 +1,48 @@
 #!/usr/bin/env bash
 #
-# Collects and prints spaceweather sensor data from NASA / NOAA
-# Author: Curtis Kneisel
-# GitHub: https://github.com/curtis86/spaceweather
+# spaceweather
 
-# Uncomment for debug
-#set -x
+# BASH MODES
+set -u
+set -o pipefail
 
 # CONSTANTS
-home_d="$( dirname $0 )" ; readonly home_d="$( cd "${home_d}" ; pwd )"
-readonly conf_f="${home_d}/spaceweather.conf"
-readonly libraries_d="${home_d}/libraries"
-readonly data_d="${home_d}/data"
-readonly dependencies=( "bc" "wget" )
-readonly max_args=2
-
-# SCRIPT FUNCTIONS
-abrt() { echo ; echo "$@" ; exit 1 ; }
-msg() { echo ; echo "$@" ; }
-vmsg() { [ $verbose ] && echo ; [ $verbose ] && echo "$@" >&2 ; }
+readonly HOME_DIR="$( cd "$( dirname $0 )" ; pwd )"
+readonly INCLUDES_DIR="${HOME_DIR}/includes"
 
 # INCLUDES
-source "${conf_f}" || abrt "ERROR: unable to load configuration file (${conf_f}). Exiting."
-source "${libraries_d}/functions.sh" || abrt "ERROR: unable to load functions file (${libraries_d}/functions.sh). Exiting."
-source "${libraries_d}/measurements.sh" || abrt "ERROR: unable to load measurements library file (${libraries_d}/measurements.sh). Exiting."
+source "${INCLUDES_DIR}/bp.sh"
+source "${INCLUDES_DIR}/spaceweather_vars.sh"
+source "${INCLUDES_DIR}/spaceweather_functions.sh"
 
 # MAIN
 main() {
-  # Dependency check
-  for dep in "${dependencies[@]}" ; do
-    if ! which ${dep} >/dev/null 2>&1 ; then
-      abrt "ERROR: dependency ${dep} not found in \$PATH setting. Please install ${dep} first."
-    fi
-  done
 
-  [ -z "$1" ] && msg "ERROR: no argument received." && usage && exit
+  set +u
+  [ -z "$1" ] && bp::msg "${t_bold}${t_red}ERROR:${t_normal} No argument received - exiting" && echo && usage && exit 1
+  set -u
+
+  # Ensure directories exist
+  setup_directories
+
+  verbose=false
 
   # Parse arguments... crudely
   OPTS=$@
-  for opt in $@ ; do
+  for opt in ${OPTS[@]} ; do
     case $opt in
       "--verbose") verbose=true ; OPTS=$( echo "$@" | sed "s/${opt}//g" ) ; set -- $OPTS ;;
-      "--update") verbose=true; update_datasources ; exit $? ;;
+      "--update") verbose=true; update_datasource ; exit $? ;;
       "--help") usage && exit ;;
-      --*) abrt "ERROR: uknown option: ${opt}. Exiting." ;;
-      -*) abrt "ERROR: uknown option: ${opt}. Exiting." ;;
+      --*) bp::abrt "uknown option: ${opt}" ;;
+      -*) bp::abrt "uknown option: ${opt}" ;;
     esac
   done
-
-  # Check directories exist and are writeable
-  if ! check_directory_access "${home_d}" "${data_d}" >/dev/null 2>&1 ; then
-    abrt "ERROR: some directories are not writeable. Please ensure this user has R+W access."
-  fi
 
   # Get list of measurement functions
   declare -a measurements
   if ! list_measurements >/dev/null 2>&1 ; then
-    abrt "ERROR: no measurement functions found. Exiting."
+    bp::abrt "no measurement functions found"
   else
     measurements=( $( list_measurements ) )
   fi
@@ -66,13 +52,12 @@ main() {
   for remaining_opt in "${remaining_opts[@]}" ; do
     containsElement "${remaining_opt}" "${measurements[@]}"
     if [ $? -ne 0 ]; then
-      abrt "ERROR: ${remaining_opt} is not a valid measurement or option. Exiting."
+      bp::abrt "${remaining_opt} is not a valid measurement or option"
     fi
   done
 
   # Get latest data
-  update_datasources || abrt "ERROR: Unable to retreive latest data. Exiting."
-
+  update_datasource || bp::abrt "Unable to retreive latest data"
 
   if [ -n "$1" ]; then
     measurements=( $( echo $@ ) )
@@ -82,7 +67,7 @@ main() {
       if [ ${measurement_ec} -eq 0 ]; then
         echo "${measurement}: $( ${measurement} 2>/dev/null ; measurement_ec=$? )"
       elif [ ${measurement_ec} -eq 127 ]; then
-        abrt "ERROR: Measurement ${measurement} not found. Exiting"
+        bp::abrt "Measurement ${measurement} not found"
       else
         echo "${measurement}: 9999"
       fi
@@ -91,7 +76,9 @@ main() {
     abrt "ERROR: no measurement found."
   fi
 
-  vmsg "Script completed" >&2
+  [ ${verbose} = true ] && vmsg "Script completed" >&2
+
+
 }
 
 main $@

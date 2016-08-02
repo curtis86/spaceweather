@@ -2,15 +2,21 @@
 
 ## A. Summary
 
-Retrieves spaceweather measurements from various sources (eg: ACE, NOAA). Current measurements:
+Retrieves spaceweather measurements from various sources (eg: DSCOVR, ACE, WING). Current supported measurements:
 
+- DSCOVR IMF Magnetometer Bz
+- DSCOVR IMF Mangetometer Bt
+- DSCOVR Plasma Particle Density
+- DSCOVR Plasma Particle Speed
 - ACE IMF Magnetometer Bz
 - ACE Solar Wind Speed
 - ACE Particle Density
 - Wing Kp Index (Current, 1-hour and 4-hour forecast)
-- Solar Wind ETA (based on ACE Solar Wind Speed)
+- Solar Wind ETA (based on ACE or DSCOVR Plasma Speed)
 
 See some of the data in action at https://spaceweather.xyz/
+
+**Note:** In July 2016, NOAA/SWPC switched from ACE to DSCOVR for space weather data. I would recommend doing the same.
 
 ## B. Dependencies
 
@@ -20,11 +26,13 @@ The following binaries are required:
 
 2) wget
 
+3) jq
+
 These dependencies are widely available for almost every Linux/BSD distro.
 
 ## C. Supported Systems
 
-This should work on any system with BASH 4 or later.
+This should work on any system with BASH 4 or later. Tested on CentOS Linux and OS X 10.11.16
 
 ### Installation
 
@@ -37,16 +45,23 @@ This should work on any system with BASH 4 or later.
 
 ```
 Usage: spaceweather <measurement> <options>
+
 Options:
 --help     shows this usage info
 --verbose  prints verbose output
 --update   updates datasources and exits
 
-Measurements:
+Supported measurements:
+
 m_ace_magnetometer_bz
 m_ace_particle_density
 m_ace_solar_wind_eta
 m_ace_solar_wind_speed
+m_dscovr_magnetometer_bt
+m_dscovr_magnetometer_bz
+m_dscovr_plasma_density
+m_dscovr_plasma_speed
+m_dscovr_solar_wind_eta
 m_wing_kp_four_hour_forecast
 m_wing_kp_index
 m_wing_kp_one_hour_forecast
@@ -66,7 +81,7 @@ m_wing_kp_index: 3.67
 
 ## Notes
 
-From time to time, data measurements by ACE can include a bad or missing data record. In this case, the measurement will return 9999.
+From time to time, data measurements can include a bad or missing data record. In this case, the measurement will return 9999.
 
 ## Disclaimer
 
@@ -74,13 +89,13 @@ I'm not a programmer, but I do like to make things! Please use this at your own 
 
 ## Thanks
 
-Big thanks to NASA and NOAA for making this data so easily available at such high frequencies.
+Big thanks to SWPC & NOAA for making this data so easily available at such high frequencies. Thanks to ACE (Advanced Composition Explorer) for all its hard work over the years!
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Curtis K
+Copyright (c) 2016 Curtis K
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
