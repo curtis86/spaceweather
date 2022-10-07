@@ -12,9 +12,9 @@ usage() {
   echo "${t_bold}Usage:${t_normal} $( basename $0 ) <measurement> <options>"
   echo ""
   echo "${t_bold}Options: ${t_normal}"
-  echo "--help     shows this usage info"
-  echo "--verbose  prints verbose output"
-  echo "--update   updates datasources and exits"
+  echo -e "\\t--help     shows this usage info"
+  echo -e "\t--verbose  prints verbose output"
+  echo -e "\t--update   updates datasources and exits"
   echo ""
   echo "${t_bold}Supported measurements: ${t_normal}"
   echo ""
@@ -48,10 +48,10 @@ update_datasource() {
   local datasource="$1"
 
   if [ -n "${datasource}" ]; then
-    
     local datasources="${datasource}"
   else
-    local datasources=( "http://services.swpc.noaa.gov/text/ace-magnetometer.txt" "http://services.swpc.noaa.gov/text/wing-kp.txt" "http://services.swpc.noaa.gov/text/ace-swepam.txt" "http://services.swpc.noaa.gov/products/solar-wind/mag-2-hour.json" "http://services.swpc.noaa.gov/products/solar-wind/plasma-2-hour.json" )
+    # Removed "http://services.swpc.noaa.gov/text/wing-kp.txt"
+    local datasources=( "http://services.swpc.noaa.gov/text/ace-magnetometer.txt" "http://services.swpc.noaa.gov/text/ace-swepam.txt" "http://services.swpc.noaa.gov/products/solar-wind/mag-2-hour.json" "http://services.swpc.noaa.gov/products/solar-wind/plasma-2-hour.json" )
   fi
   
   set -u
@@ -60,8 +60,9 @@ update_datasource() {
   bp::test_access "${DATA_DIR}"
 
   for datasource in "${datasources[@]}" ; do
-    local get_data="$( cd ${DATA_DIR} ; wget --timeout=${update_timeout} -q -N "${datasource}" )"
-    if [ $? -ne 0 ]; then
+    local get_data
+
+    if ! get_data="$( cd ${DATA_DIR} ; wget --timeout=${update_timeout} -q -N "${datasource}" 2>&1 )" ; then
       bp::abrt "unable to retrieve datasource ${datasource}"
     fi
   done
@@ -79,7 +80,6 @@ update_datasource() {
 #   1 for absent value
 #######################################
 containsElement () {
-
   local e
   for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
   return 1
@@ -109,7 +109,6 @@ m_ace_magnetometer_bz () {
 #######################################
 m_ace_solar_wind_speed () {
 
-
   local data_f="${DATA_DIR}/ace-swepam.txt"
   local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$7 == 0 { print $9 }' | tail -n1 )"
 
@@ -125,7 +124,6 @@ m_ace_solar_wind_speed () {
 # Unit: p/cc
 #######################################
 m_ace_particle_density () {
-
 
   local data_f="${DATA_DIR}/ace-swepam.txt"
   local data="$( grep -v ^# ${data_f} | grep '^[0-9]' | awk '$7 == 0 { print $8 }' | tail -n1 )"
@@ -155,49 +153,49 @@ m_ace_solar_wind_eta () {
 }
 
 #######################################
-# Returns Wing Kp Index (Current USAF)
+# Returns Wing Kp Index (Current USAF) - deprecated as this data is no longer available
 #######################################
-m_wing_kp_index () {
-
-  local data_f="${DATA_DIR}/wing-kp.txt"
-  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$15 != -1 { print $15 }' | tail -n1 )"
-
-  if [ -z "${data}" ]; then
-    return 1
-  else
-    echo "${data}"
-  fi
-}
-
-#######################################
-# Returns Wing Kp Index 1-hour Forecast
-#######################################
-m_wing_kp_one_hour_forecast () {
-
-  local data_f="${DATA_DIR}/wing-kp.txt"
-  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$9 != -1 { print $9 }' | tail -n1 )"
-
-  if [ -z "${data}" ]; then
-    return 1
-  else
-    echo "${data}"
-  fi
-}
+#m_wing_kp_index () {
+#  
+#  local data_f="${DATA_DIR}/wing-kp.txt"
+#  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$15 != -1 { print $15 }' | tail -n1 )"
+#
+#  if [ -z "${data}" ]; then
+#    return 1
+#  else
+#    echo "${data}"
+#  fi
+#}
 
 #######################################
-# Returns Wing Kp Index 4-hour Forecast
+# Returns Wing Kp Index 1-hour Forecast - deprecated as this data is no longer available
 #######################################
-m_wing_kp_four_hour_forecast () {
+#m_wing_kp_one_hour_forecast () {
+#
+#  local data_f="${DATA_DIR}/wing-kp.txt"
+#  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$9 != -1 { print $9 }' | tail -n1 )"
+#
+#  if [ -z "${data}" ]; then
+#    return 1
+#  else
+#    echo "${data}"
+#  fi
+#}
 
-  local data_f="${DATA_DIR}/wing-kp.txt"
-  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$14 != -1 { print $14 }' | tail -n1 )"
-
-  if [ -z "${data}" ]; then
-    return 1
-  else
-    echo "${data}"
-  fi
-}
+#######################################
+# Returns Wing Kp Index 4-hour Forecast - deprecated as this data is no longer available
+#######################################
+#m_wing_kp_four_hour_forecast () {
+#
+#  local data_f="${DATA_DIR}/wing-kp.txt"
+#  local data="$( grep -v ^# "${data_f}" | grep '^[0-9]' | awk '$14 != -1 { print $14 }' | tail -n1 )"
+#
+#  if [ -z "${data}" ]; then
+#    return 1
+#  else
+#    echo "${data}"
+#  fi
+#}
 
 #######################################
 # Returns DSCOVR IMF magnetometer Bz

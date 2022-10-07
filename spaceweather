@@ -29,7 +29,7 @@ main() {
   OPTS=$@
   for opt in ${OPTS[@]} ; do
     case $opt in
-      "--update") { bp::vmsg "Updating datasource(s)..." ; update_datasource ; vmsg "Script completed" ; exit $? ;} ;;
+      "--update") { bp::vmsg "Updating datasource(s)... " ; update_datasource ; bp::vmsg "update completed" ; exit $? ;} ;;
       "--help") usage && exit ;;
       --*) bp::abrt "uknown option: ${opt}" ;;
       -*) bp::abrt "uknown option: ${opt}" ;;
